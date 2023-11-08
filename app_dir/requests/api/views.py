@@ -5,14 +5,17 @@ from rest_framework.generics import (
   ListAPIView, CreateAPIView,
   RetrieveUpdateAPIView,
   RetrieveAPIView,
-  DestroyAPIView
+  DestroyAPIView,
+  ListCreateAPIView,
+  RetrieveUpdateDestroyAPIView
 )
 from rest_framework import pagination
 from rest_framework.permissions import (
  IsAuthenticatedOrReadOnly
 )
 from ...core.pagination import PostLimitOffsetPagination
-from .serializers import TABLE, RequestsSerializer, RequestsCreateSerializer
+from ..models import Comment
+from .serializers import TABLE, RequestsSerializer, RequestsCreateSerializer, CommentCreateSerializer
 
 
 class RequestsListAPIView(ListAPIView):
@@ -48,7 +51,6 @@ class RequestsCreateAPIView(CreateAPIView):
     permission_classes = [IsAuthenticatedOrReadOnly]
 
     def post(self, request, format=None):
-        print(request.data)
         serializer = RequestsCreateSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save(author=request.user)
@@ -73,3 +75,26 @@ class RequestsUpdateAPIView(RetrieveUpdateAPIView):
     permission_classes = [IsAuthenticatedOrReadOnly]
     queryset = TABLE.objects.all()
     serializer_class = RequestsSerializer
+
+
+class CommentListCreateAPIView(ListAPIView):
+    queryset = Comment.objects.all()
+    serializer_class = CommentCreateSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+class CommentDetailAPIView(RetrieveUpdateDestroyAPIView):
+    queryset = Comment.objects.all()
+    serializer_class = CommentCreateSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+class RequestCommentsListAPIView(ListCreateAPIView):
+    serializer_class = CommentCreateSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def get_queryset(self):
+        request_id = self.kwargs.get('request_id')
+        return Comment.objects.filter(request_id=request_id)
+
+    def perform_create(self, serializer):
+        request_id = self.kwargs.get('request_id')
+        serializer.save(request_id=request_id, author=self.request.user)
