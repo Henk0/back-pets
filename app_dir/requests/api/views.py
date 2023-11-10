@@ -2,20 +2,20 @@ from django.db.models import Q
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.generics import (
-  ListAPIView, CreateAPIView,
-  RetrieveUpdateAPIView,
-  RetrieveAPIView,
-  DestroyAPIView,
-  ListCreateAPIView,
-  RetrieveUpdateDestroyAPIView
+    ListAPIView, CreateAPIView,
+    RetrieveUpdateAPIView,
+    RetrieveAPIView,
+    DestroyAPIView,
+    ListCreateAPIView,
+    RetrieveUpdateDestroyAPIView
 )
 from rest_framework import pagination
 from rest_framework.permissions import (
- IsAuthenticatedOrReadOnly
+    IsAuthenticatedOrReadOnly
 )
 from ...core.pagination import PostLimitOffsetPagination
 from ..models import Comment
-from .serializers import TABLE, RequestsSerializer, RequestsCreateSerializer, CommentCreateSerializer
+from .serializers import TABLE, RequestsSerializer, RequestsCreateSerializer, CommentCreateSerializer, COMMENT
 
 
 class RequestsListAPIView(ListAPIView):
@@ -31,7 +31,7 @@ class RequestsListAPIView(ListAPIView):
         query = self.request.GET.get('q')
         author = self.request.GET.get('uid')
         pagination.PageNumberPagination.page_size = page_size if page_size else 10
-        
+
         if author:
             queryset_list = queryset_list.filter(
                 author=author
@@ -53,6 +53,7 @@ class RequestsCreateAPIView(CreateAPIView):
     def post(self, request, format=None):
         serializer = RequestsCreateSerializer(data=request.data)
         if serializer.is_valid():
+            print('request ', request.data)
             serializer.save(author=request.user)
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
@@ -77,24 +78,35 @@ class RequestsUpdateAPIView(RetrieveUpdateAPIView):
     serializer_class = RequestsSerializer
 
 
-class CommentListCreateAPIView(ListAPIView):
+class CommentListAPIView(ListAPIView):
     queryset = Comment.objects.all()
     serializer_class = CommentCreateSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
+
 
 class CommentDetailAPIView(RetrieveUpdateDestroyAPIView):
     queryset = Comment.objects.all()
     serializer_class = CommentCreateSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
 
-class RequestCommentsListAPIView(ListCreateAPIView):
+
+class RequestCommentsListAPIView(ListAPIView):
+    serializer_class = CommentCreateSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    def get_queryset(self, *args, **kwargs):
+        request_id = self.kwargs.get('request_id')
+        queryset_list = COMMENT.objects.filter(request_id=request_id)
+        return queryset_list.order_by('created')
+
+
+class RequestCommentsCreateAPIView(CreateAPIView):
     serializer_class = CommentCreateSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
 
-    def get_queryset(self):
-        request_id = self.kwargs.get('request_id')
-        return Comment.objects.filter(request_id=request_id)
-
     def perform_create(self, serializer):
-        request_id = self.kwargs.get('request_id')
-        serializer.save(request_id=request_id, author=self.request.user)
+        if serializer.is_valid():
+            request_id = self.kwargs.get('request_id')
+            serializer.save(request_id=request_id, author=self.request.user)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

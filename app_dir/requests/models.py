@@ -53,6 +53,7 @@ class Comment(models.Model):
     created = models.DateTimeField(auto_now_add=True)
 
     class Meta:
+        app_label = 'requests'
         ordering = ('created',)
 
     def __str__(self):

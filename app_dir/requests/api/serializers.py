@@ -3,6 +3,7 @@ from ...core.loading import get_model
 from ..models import Comment
 
 TABLE = get_model('requests', 'Request')
+COMMENT = get_model('requests', 'Comment')
 APP = 'requests_api'
 fields = ('id', 'name', 'description', 'langitute', 'latitude', 'author', 'photo', 'created_at', 'updated_at')
 
@@ -32,7 +33,6 @@ class RequestsCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = TABLE
         fields = fields
-
     def create(self, validated_data):
         TABLE.objects.create(**validated_data)
         return validated_data
@@ -40,10 +40,8 @@ class RequestsCreateSerializer(serializers.ModelSerializer):
 
 class CommentCreateSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Comment
+        model = COMMENT
         fields = ('id', 'request', 'author', 'body', 'created')
-
     def create(self, validated_data):
-        validated_data['author'] = self.context['request'].user
-        comment = Comment.objects.create(**validated_data)
+        comment = COMMENT.objects.create(**validated_data)
         return comment
