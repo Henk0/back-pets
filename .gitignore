@@ -70,6 +70,6 @@ update-env.py
 */migrations/*
 !*/migrations/__init__.py
 
-
+mediafiles/
 
 

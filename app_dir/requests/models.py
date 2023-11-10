@@ -26,10 +26,10 @@ class Request(models.Model):
         null=True, 
         blank=True, 
         on_delete=models.SET_NULL)
-    # photo = models.ImageField(
-    #     upload_to=upload_to, 
-    #     blank=True, 
-    #     null=True)
+    photo = models.ImageField(
+        upload_to=upload_to,
+        blank=True,
+        null=True)
     created_at = models.DateTimeField(
         default=now,
         editable=False
@@ -43,3 +43,17 @@ class Request(models.Model):
 
     def __str__(self):
         return self.name
+
+class Comment(models.Model):
+    request = models.ForeignKey(Request, related_name='comments', null=True,
+        blank=True, on_delete=models.CASCADE)
+    author = models.ForeignKey(User, null=True,
+        blank=True, on_delete=models.CASCADE)
+    body = models.TextField()
+    created = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ('created',)
+
+    def __str__(self):
+        return 'Comment by {} on {}'.format(self.author, self.request)
