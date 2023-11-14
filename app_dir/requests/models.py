@@ -5,6 +5,11 @@ from app_dir.user.api.serializers import User
 def upload_to(instance, filename):
     return 'images/{filename}'.format(filename=filename)
 
+TYPE_CHOICES = (('Кот', 'Кот'),
+            ('Собака', 'Собака'),
+            ('Другое', 'Другое'))
+STATUS_CHOICES = (('Найден', 'Найден'),
+            ('Потерян', 'Потерян'))
 class Request(models.Model):
     name = models.CharField(
         max_length=128
@@ -30,6 +35,8 @@ class Request(models.Model):
         upload_to=upload_to,
         blank=True,
         null=True)
+    pet_type = models.TextField(default='Кот', blank=False, null=False, choices=TYPE_CHOICES)
+    status = models.TextField(default='Потерян', blank=False, null=False, choices=STATUS_CHOICES)
     created_at = models.DateTimeField(
         default=now,
         editable=False

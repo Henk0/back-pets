@@ -30,6 +30,8 @@ class RequestsListAPIView(ListAPIView):
         page_size = self.request.GET.get(page_size_key)
         query = self.request.GET.get('q')
         author = self.request.GET.get('uid')
+        status = self.request.GET.get('status')
+        pet_type = self.request.GET.get('type')
         pagination.PageNumberPagination.page_size = page_size if page_size else 10
 
         if author:
@@ -41,6 +43,14 @@ class RequestsListAPIView(ListAPIView):
             queryset_list = queryset_list.filter(
                 Q(name__icontains=query) |
                 Q(description__icontains=query)
+            )
+        if status:
+            queryset_list = queryset_list.filter(
+                Q(status=status)
+            )
+        if pet_type:
+            queryset_list = queryset_list.filter(
+                Q(pet_type=pet_type)
             )
 
         return queryset_list.order_by('updated_at')
