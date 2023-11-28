@@ -16,6 +16,8 @@ from rest_framework.permissions import (
 from ...core.pagination import PostLimitOffsetPagination
 from ..models import Comment
 from .serializers import TABLE, RequestsSerializer, RequestsCreateSerializer, CommentCreateSerializer, COMMENT
+from django.db import models
+from django.db.models import ExpressionWrapper, F
 
 
 class RequestsListAPIView(ListAPIView):
@@ -30,6 +32,8 @@ class RequestsListAPIView(ListAPIView):
         page_size = self.request.GET.get(page_size_key)
         query = self.request.GET.get('q')
         author = self.request.GET.get('uid')
+        lat = self.request.GET.get('lat')
+        lon = self.request.GET.get('lon')
         status = self.request.GET.get('status')
         pet_type = self.request.GET.get('type')
         pagination.PageNumberPagination.page_size = page_size if page_size else 10
@@ -52,6 +56,18 @@ class RequestsListAPIView(ListAPIView):
             queryset_list = queryset_list.filter(
                 Q(pet_type=pet_type)
             )
+
+        if (lon and lat):
+            print(lon)
+            print(lat)
+        
+            return queryset_list.annotate(
+                distance=ExpressionWrapper(
+                    expression=((lon - F("langitute"))**2) + ((lat - F("latitude"))**2),
+                    output_field=models.FloatField(),
+                ),
+            ).order_by('distance')
+        
 
         return queryset_list.order_by('updated_at')
 
