@@ -20,10 +20,11 @@ class UserSerializer(serializers.ModelSerializer):
         username = validated_data['username']
         email = validated_data['email']
         password = validated_data['password']
+        is_staff = validated_data['is_staff']
         user_obj = User(
             username=username,
             email=email,
-            is_staff=True
+            is_staff=is_staff
         )
         user_obj.set_password(password)
         user_obj.save()

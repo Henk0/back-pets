@@ -58,8 +58,6 @@ class RequestsListAPIView(ListAPIView):
             )
 
         if (lon and lat):
-            print(lon)
-            print(lat)
         
             return queryset_list.annotate(
                 distance=ExpressionWrapper(
@@ -79,7 +77,6 @@ class RequestsCreateAPIView(CreateAPIView):
     def post(self, request, format=None):
         serializer = RequestsCreateSerializer(data=request.data)
         if serializer.is_valid():
-            print('request ', request.data)
             serializer.save(author=request.user)
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
