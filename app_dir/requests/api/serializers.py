@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from ...core.loading import get_model
-from ..models import Comment
+from ...user.api.serializers import UserSerializer
 
 TABLE = get_model('requests', 'Request')
 COMMENT = get_model('requests', 'Comment')
@@ -9,6 +9,7 @@ fields = ('id', 'name', 'description', 'langitute', 'latitude', 'author', 'photo
 
 
 class RequestsSerializer(serializers.ModelSerializer):
+    author = UserSerializer(many=False, read_only=True)
     update_url = serializers.HyperlinkedIdentityField(view_name=APP + ':update')
     delete_url = serializers.HyperlinkedIdentityField(view_name=APP + ':delete')
 
@@ -41,6 +42,7 @@ class RequestsCreateSerializer(serializers.ModelSerializer):
 
 
 class CommentCreateSerializer(serializers.ModelSerializer):
+    author = UserSerializer(many=False, read_only=True)
     class Meta:
         model = COMMENT
         fields = ('id', 'request', 'author', 'body', 'created')

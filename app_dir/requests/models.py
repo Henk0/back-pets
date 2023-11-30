@@ -10,6 +10,7 @@ TYPE_CHOICES = (('Кот', 'Кот'),
             ('Другое', 'Другое'))
 STATUS_CHOICES = (('Найден', 'Найден'),
             ('Потерян', 'Потерян'))
+
 class Request(models.Model):
     name = models.CharField(
         max_length=128
