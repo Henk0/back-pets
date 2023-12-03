@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
+import datetime
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -147,5 +148,6 @@ JWT_AUTH = {
     'JWT_RESPONSE_PAYLOAD_HANDLER':
     #'rest_framework_jwt.utils.jwt_response_payload_handler',
     'app_dir.user.api.views.jwt_response_payload_handler',
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(days=30)
 }
 
