@@ -19,6 +19,10 @@ class Request(models.Model):
         blank=True,
         null=True
     )
+    location = models.TextField(
+        blank=True,
+        null=True
+    )
     langitute = models.FloatField(
         blank=False,
         null=False

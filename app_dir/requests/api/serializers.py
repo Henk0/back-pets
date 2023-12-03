@@ -5,7 +5,7 @@ from ...user.api.serializers import UserSerializer
 TABLE = get_model('requests', 'Request')
 COMMENT = get_model('requests', 'Comment')
 APP = 'requests_api'
-fields = ('id', 'name', 'description', 'langitute', 'latitude', 'author', 'photo', 'pet_type', 'status', 'created_at', 'updated_at')
+fields = ('id', 'name', 'description', 'location', 'langitute', 'latitude', 'author', 'photo', 'pet_type', 'status', 'created_at', 'updated_at')
 
 
 class RequestsSerializer(serializers.ModelSerializer):
@@ -20,6 +20,7 @@ class RequestsSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         instance.name = validated_data.get('name', instance.name)
         instance.description = validated_data.get('description', instance.description)
+        instance.location = validated_data.get('location', instance.langitute)
         instance.langitute = validated_data.get('langitute', instance.langitute)
         instance.latitude = validated_data.get('latitude', instance.latitude)
         instance.pet_type = validated_data.get('pet_type', instance.pet_type)

@@ -46,7 +46,8 @@ class RequestsListAPIView(ListAPIView):
         if query:
             queryset_list = queryset_list.filter(
                 Q(name__icontains=query) |
-                Q(description__icontains=query)
+                Q(description__icontains=query) |
+                Q(location__icontains=query)
             )
         if status:
             queryset_list = queryset_list.filter(
@@ -67,7 +68,7 @@ class RequestsListAPIView(ListAPIView):
             ).order_by('distance')
         
 
-        return queryset_list.order_by('updated_at')
+        return queryset_list.order_by('-updated_at')
 
 
 class RequestsCreateAPIView(CreateAPIView):
@@ -119,7 +120,7 @@ class RequestCommentsListAPIView(ListAPIView):
     def get_queryset(self, *args, **kwargs):
         request_id = self.kwargs.get('request_id')
         queryset_list = COMMENT.objects.filter(request_id=request_id)
-        return queryset_list.order_by('created')
+        return queryset_list.order_by('-created')
 
 
 class RequestCommentsCreateAPIView(CreateAPIView):
